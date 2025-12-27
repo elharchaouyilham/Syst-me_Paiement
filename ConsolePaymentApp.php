@@ -1,6 +1,4 @@
 <?php
-
-
 require_once "./exception/ValidationException.php";
 require_once "./exception/EntityCreationException.php";
 require_once "./exception/ServerErrorException.php";
