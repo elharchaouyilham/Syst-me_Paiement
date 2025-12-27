@@ -1,27 +1,44 @@
 create database payment;
 
-CREATE TABLE Clients (
+CREATE TABLE clients (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE
 );
 
-CREATE TABLE Commandes (
+CREATE TABLE commandes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     client_id INT NOT NULL,
-    montant_total float NOT NULL,
-    statut VARCHAR(50) NOT NULL DEFAULT 'EN_ATTENTE',
+    montantTotal float NOT NULL,
+    status ENUM('Pending', 'Out for Delivery', 'Delivered') NOT NULL ,
 
-   FOREIGN KEY (client_id)REFERENCES Clients(id)     
+   FOREIGN KEY (client_id)REFERENCES clients(id)     
 );
 
-CREATE TABLE Paiements (
+CREATE TABLE  paiements (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    commande_id INT NOT NULL UNIQUE,
-    type_paiement ENUM('CARTE', 'PAYPAL', 'VIREMENT') NOT NULL,
+    commande_id int,
     montant float NOT NULL,
-    statut VARCHAR(50) NOT NULL DEFAULT 'EN_ATTENTE',
-    date_paiement date NULL,
+    status ENUM('Unpaid', 'Paid') NOT NULL ,
+    date_paiement DATE DEFAULT CURRENT_DATE ,
 
-    FOREIGN KEY (commande_id)REFERENCES Commandes(id)
+    FOREIGN KEY (commande_id)REFERENCES commandes(id)
 );
+
+create table virements (
+paiement_id INT ,
+ rib VARCHAR (50),
+ FOREIGN KEY (paiment_id)REFERENCES  paiements(id)
+);
+create table cartebancaires (
+ paiement_id INT ,
+ creditCardNumber int,
+ FOREIGN KEY (paiment_id)REFERENCES  paiements(id)
+);
+create table paypals (
+paiement_id INT ,
+paymentEmail VARCHAR (20),
+paymentPassword VARCHAR (30),
+ FOREIGN KEY (paiment_id)REFERENCES  paiements(id)
+);
+

@@ -4,17 +4,15 @@
 require_once "./config/Database.php";
 require_once "BaseRepository.php";
 
-class CommandeRepository implements BaseRepository
+class PaymentRepository implements BaseRepository
 {
 
     private $conn;
 
-    // private $clientRepository; 
 
     public function __construct()
     {
         $this->conn = new Database()->getConnection();
-        // $this->clientRepository = new ClientRepository();
     }
 
 
@@ -77,51 +75,85 @@ class CommandeRepository implements BaseRepository
         }
     }
 
-    public function create($commande)
+    public function create($payment)
     {
 
-    
-        $query = "insert into Commandes(montantTotal,status, client_id) 
-        values(:montantTotal, :status, :client_id)";
+        $query = "insert into paiements(montant,status, commande_id) 
+        values(:montant,:status,:commande_id)";
 
         try {
             $stmt = $this->conn->prepare($query);
             $stmt->execute([
-                ":client_id" => $commande->client->id,
-                ":montantTotal" => $commande->montantTotal,
-                ":status" => $commande->status,
+                ":montant" => $payment->montant,
+                ":status" => $payment->status,
+                ":commande_id" => $payment->commande->id,
             ]);
 
             (int) $id = $this->conn->lastInsertId();
 
             if ($id) {
-                $commande->setId($id);
-                return $commande;
+                $payment->setId($id);
+
+                if ($payment instanceof Carte) {
+                    $query = "insert into cartebancaires(paiment_id, creditCardNumber) 
+                      values(:paiment_id, :creditCardNumber)";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->execute([
+                        ":paiment_id" => $payment->id,
+                        ":creditCardNumber" => $payment->creditCardNumber
+                    ]);
+                }else if ($payment instanceof PayPal) {
+
+                   $query = "insert into paypals(paiment_id, paymentEmail, paymentPassword) 
+                      values(:paiment_id, :paymentEmail, :paymentPassword)";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->execute([
+                        ":paiment_id" => $payment->id,
+                        ":paymentEmail" => $payment->paymentEmail,
+                        ":paymentPassword" => $payment->paymentPassword
+                    ]);
+                }else{
+
+                    $query = "insert into virements(paiment_id, rib) 
+                      values(:paiment_id, :rib)";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->execute([
+                        ":paiment_id" => $payment->id,
+                        ":rib" => $payment->rib
+                    ]);
+                }
+
+
+                return $payment;
             }
 
-            throw new EntityCreationException(" Commande creation error ", 403);
+
+            throw new EntityCreationException(" Payment creation error ", 403);
         } catch (\Throwable $th) {
-            throw new EntityCreationException(" Commande creation error ", 403);
+            throw new EntityCreationException(" Payment creation error ".$th->getMessage(), 403);
         }
     }
 
 
-    public function update($commande)
+    public function update($id)
     {
 
-        $query = "update commandes set status=:status where id=:id";
+
+        $client = $this->findById($id);
+
+        $query = "update clients set name =:name, email =:email where id=:id";
 
         try {
             $stmt = $this->conn->prepare($query);
             $stmt->execute([
-                ":id" => $commande->id,
-                ":status" => $commande->status,
+                ":id" => $client->id,
+                ":name" => $client->name,
+                ":email" => $client->email
             ]);
 
-            return $commande;
-
+            throw new EntityCreationException(" Client with id: " . $client->id . "update error", 403);
         } catch (\Throwable $th) {
-            throw new EntityCreationException(" commande with id: " . $commande->id . "update error: ".$th->getMessage(), 403);
+            throw new EntityCreationException(" Client with id: " . $client->id . "update error", 403);
         }
     }
 

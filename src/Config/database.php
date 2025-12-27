@@ -1,15 +1,31 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "payment";
+
+require_once "./exception/ValidationException.php";
+class Database {
+
+    private $host = "localhost";
+    private $dbName = "payment";
+    private $username = "root";
+    private $password = "";
 
 
-try {
-  $conn = new PDO("mysql:host=$servername;dbname=payment", $username, $password);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  echo "Connected successfully";
-} catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
+    private $conn;
+
+
+
+    public function __construct()
+    {
+    
+         try {
+            $this->conn = new PDO("mysql:host=$this->host;dbname=$this->dbName;", $this->username, $this->password);
+         } catch (\PDOException $th) {
+            throw new ServerErrorException("Database Error", 500, $th);
+         }
+    }
+
+
+    public function getConnection(){
+        return $this->conn;
+    }
+
 }
-?>
