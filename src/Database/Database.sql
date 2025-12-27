@@ -20,23 +20,23 @@ CREATE TABLE  paiements (
     commande_id int,
     montant float NOT NULL,
     status ENUM('Unpaid', 'Paid') NOT NULL ,
-    date_paiement DATE DEFAULT CURRENT_DATE ,
+     date_paiment DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (commande_id)REFERENCES commandes(id)
 );
 
 create table virements (
-paiement_id INT ,
+paiment_id INT ,
  rib VARCHAR (50),
  FOREIGN KEY (paiment_id)REFERENCES  paiements(id)
 );
 create table cartebancaires (
- paiement_id INT ,
+ paiment_id INT ,
  creditCardNumber int,
  FOREIGN KEY (paiment_id)REFERENCES  paiements(id)
 );
 create table paypals (
-paiement_id INT ,
+paiment_id INT ,
 paymentEmail VARCHAR (20),
 paymentPassword VARCHAR (30),
  FOREIGN KEY (paiment_id)REFERENCES  paiements(id)
