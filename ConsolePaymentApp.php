@@ -55,16 +55,13 @@ class ConsolePaymentApp
         } catch (ValidationException $e) {
             echo "\n \n Code: " . $e->getCode() . " Message:" . $e->getMessage();
             // $this->run();
-        }
-         catch (EntityCreationException $e) {
+        } catch (EntityCreationException $e) {
             echo "\n \n Code: " . $e->getCode() . " Message:" . $e->getMessage();
             // $this->run();
-        }
-        catch (ServerErrorException $e) {
+        } catch (ServerErrorException $e) {
             echo "\n \n Code: " . $e->getCode() . " Message:" . $e->getMessage();
             // $this->run();
-        }
-         catch (EntitySearchException $e) {
+        } catch (EntitySearchException $e) {
             echo "\n \n Code: " . $e->getCode() . " Message:" . $e->getMessage();
             // $this->run();
         }
@@ -82,9 +79,6 @@ class ConsolePaymentApp
         echo "│ 3. Créer une commande                                   │\n";
         echo "│ 4. Lister les commandes                                 │\n";
         echo "│ 5. Créer un paiement                                    │\n";
-        echo "│ 6. Traiter un paiement                                  │\n";
-        echo "│ 7. Consulter le statut d'un paiement                    │\n";
-        echo "│ 8. Lister tous les paiements                            │\n";
         echo "│ 0. Quitter                                              │\n";
         echo "└─────────────────────────────────────────────────────────┘\n";
     }
@@ -133,7 +127,7 @@ class ConsolePaymentApp
 
         $payment->setCommande($commande);
         $payment->pay();
-        
+
         $payment = $this->paymentRepository->create($payment);
 
         $this->commandeRepository->update($commande);
@@ -213,11 +207,11 @@ class ConsolePaymentApp
     }
 
 
-    
+
     public function createCarteInstance($commande)
     {
         $numeroCarte = $this->readUserInput("\n Entrez le numéro de la carte: ");
-        $payment = new Carte($commande->montantTotal,$numeroCarte );
+        $payment = new Carte($commande->montantTotal, $numeroCarte);
         return $payment;
     }
 
@@ -225,7 +219,7 @@ class ConsolePaymentApp
     {
         $email = $this->readUserInput("\n Entrez l'email: ");
         $password = $this->readUserInput("\n Entrez le password: ");
-        $payment = new PayPal($commande->montantTotal,$email, $password );
+        $payment = new PayPal($commande->montantTotal, $email, $password);
         return $payment;
     }
 
